@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
@@ -9,23 +9,31 @@ export class PostService {
     constructor(
         @InjectRepository(Post)
         private postRepository: Repository<Post>
-    ){}
+    ) {}
     async getAll() {
         const data = await this.postRepository.find()
-        console.log(data);
         return data
         
     }
-    getOne(id: number): object{
-        return {}
+    async getOne(id: number) {
+        const  data = await this.postRepository.findOne(id)
+        return data
     }
-    createOne(object): object{
-        return {ok: "Create One"}
+    async createOne(object) {
+        const postCreated = await this.postRepository.save(object)       
+        
+        return postCreated
     }
-    editOne(id, object): object{
-        return {ok: "Edit One "}
-    }
-    deleteOne(id): object{
-        return {ok: "Success Delete One"}
+    // async editOne(id, object) {
+    //     const post = await this.postRepository.findOne(id);
+
+    //     if (!post) throw new NotFoundException('Post does not exist');
+        
+    //     const editedPost = Object.assign(post, object);
+    
+    //     return await this.postRepository.save(editedPost)
+    // }
+    async deleteOne(id) {
+        return this.postRepository.delete(id)
     }
 }

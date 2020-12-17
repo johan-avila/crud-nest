@@ -1,3 +1,4 @@
+/* Esto es como crear las tablas  en MySQL*/
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("posts")

@@ -6,11 +6,18 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Put,
 } from '@nestjs/common';
-import { CreatePostDto } from './dtos';
+import { ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
+import { CreatePostDto,} from './dtos';
 
+const uniqueResponse = (message, data)=>{
+  return {
+    message,
+    data
+  } 
+}
+@ApiTags("Posts")
 @Controller('post')
 export class PostController {
   constructor(private postService: PostService) {}
@@ -18,24 +25,31 @@ export class PostController {
   @Get()
   async getAll() {
     const data =  await this.postService.getAll();
-    return data
+    return uniqueResponse("Get all data", data)
   }
   @Get(':id')
   // ParseIntPipe Convierte el Parametro a number si puede
-  getOne(@Param('id', ParseIntPipe ) id: number): object {
-    return this.postService.getOne(id)  
+  async getOne(@Param('id', ParseIntPipe ) id: number) {
+    let data = await this.postService.getOne(id) 
+
+    
+    return uniqueResponse(data ? "Get by id" : "No se encontro coincidencia", data)
   }
   @Post()
-  creteOne(@Body() dto: CreatePostDto) {
-    return this.postService.createOne(dto)
+  async creteOne(@Body() dto: CreatePostDto) {
+    const postCreated = await this.postService.createOne(dto);
+    
+    return {message: "Post created", postCreated}
   }
-  @Put(':id')
-  editOne(@Param('id') id: string, @Body() dto: CreatePostDto) {
-    return this.postService.editOne(id, dto)
-  }
+    // @Put(':id')
+    // async editOne(@Param('id', ParseIntPipe) id , @Body() dto: EditPostDto) {
+      
+
+    // }
 
   @Delete(':id')
-  deleteOne(@Param('id') id: string) {
-    return this.postService.deleteOne(id)
+  async deleteOne(@Param('id') id: string) {
+    const data  = await  this.postService.deleteOne(id)
+    return uniqueResponse("Deleted", data)
   }
 }
